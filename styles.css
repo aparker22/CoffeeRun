@@ -5,6 +5,7 @@ html, body {
 
 body {
     background-color: #D7EEF2;
+    font-family: Arial, Helvetica, sans-serif;
 }
 section {
     background-color: #F6F6E9;
@@ -12,7 +13,9 @@ section {
 
 header {
     width: 100%;
-    background-color: #F2855E;
+    background-color: rgb(170, 122, 104);
+    color: white;
+    text-align: center;
 }
 
 li {
@@ -27,7 +30,7 @@ button {
 }
 
 footer {
-    background-color: #F2855E;
+    background-color: rgb(170, 122, 104);
     color: white;
     width: 100%;
     min-height: 100px;
