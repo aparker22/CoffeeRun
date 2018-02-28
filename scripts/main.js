@@ -2,12 +2,15 @@ var coffeeOrders = [];
 var form = document.querySelector('body > section > div > div > form');
 var orderCount = Number(localStorage.getItem('Counter'));
 
+
 form.addEventListener('submit', function(event) {
     event.preventDefault();
     var order = {'Coffee': form.coffee.value, 'Email': form.emailAddress.value,
     'Size': form.size.value, 'Flavor': form.flavor.value, 'Strength': form.strength.value
     };
     var orderJSON = JSON.stringify(order);
+    orderJSON = orderJSON.replace(/"/g, '');
+    orderJSON = orderJSON.replace(/,/g, ',  ');
     coffeeOrders.push(order);
     localStorage.setItem(`Order ${orderCount}`, orderJSON);
     localStorage.setItem('Counter', orderCount)
@@ -43,13 +46,15 @@ load.addEventListener('click', function(event) {
     event.preventDefault();
     var ul = document.querySelector('body > footer > ul')
     while (ul.firstChild) ul.removeChild(ul.firstChild);
-    var order1 = document.createElement('li');
+
     if (localStorage.length === 0) {
+        var order1 = document.createElement('li');
         order1.appendChild(document.createTextNode('No Orders to Display'));
         ul.appendChild(order1);
     } else {
         for (var i=1; i<localStorage.length; i++) {
            var text = localStorage.getItem(localStorage.key(i));
+           var order1 = document.createElement('li');
            order1.appendChild(document.createTextNode(text));
            var button = document.createElement('button')
            button.appendChild(document.createTextNode('Completed'))
@@ -60,12 +65,14 @@ load.addEventListener('click', function(event) {
            ul.appendChild(order1);
         }
     }
+
 })
 
 var removeOrder = function (e) {
     target = e.target;
     target = target.parentElement;
     target.remove();
+    orderCount --;
 }
 
 
