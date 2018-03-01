@@ -1,14 +1,21 @@
 var coffeeOrders = [];
 var form = document.querySelector('body > section > div > div > form');
 var orderCount = Number(localStorage.getItem('Counter'));
-var serverURL = 'http://dc-coffeerun.herokuapp.com/api/coffeeorders';
+var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
 form.addEventListener('submit', function(event) {
     event.preventDefault();
     var order = {'Coffee': form.coffee.value, 'Email': form.emailAddress.value,
     'Size': form.size.value, 'Flavor': form.flavor.value, 'Strength': form.strength.value
     };
+    var serverOrder = {'coffee': form.coffee.value, 'emailAddress': form.emailAddress.value,
+    'size': form.size.value, 'flavor': form.flavor.value, 'strength': form.strength.value
+    };
     var orderJSON = JSON.stringify(order);
+    var serverOrderJSON = JSON.stringify(serverOrder);
+    $.post(serverURL, serverOrder, function(disp){
+        console.log(disp)
+    });
     orderJSON = orderJSON.replace(/"/g, '');
     orderJSON = orderJSON.replace(/,/g, ',  ');
     orderJSON = orderJSON.replace(/:/g, ':  ');
