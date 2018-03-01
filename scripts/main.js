@@ -1,7 +1,7 @@
 var coffeeOrders = [];
 var form = document.querySelector('body > section > div > div > form');
 var orderCount = Number(localStorage.getItem('Counter'));
-
+var serverURL = 'http://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
 form.addEventListener('submit', function(event) {
     event.preventDefault();
@@ -45,35 +45,60 @@ var load = document.querySelector('body > section > div > div > form > button:nt
 load.addEventListener('click', function(event) {
     event.preventDefault();
     var ul = document.querySelector('body > footer > ul')
+    var orders = [];
     while (ul.firstChild) ul.removeChild(ul.firstChild);
-
-    if (localStorage.length === 0) {
-        var order1 = document.createElement('li');
-        order1.appendChild(document.createTextNode('No Orders to Display'));
-        ul.appendChild(order1);
-    } else {
-        for (var i=1; i<localStorage.length; i++) {
-           var text = localStorage.getItem(localStorage.key(i));
-           var order1 = document.createElement('li');
-           order1.appendChild(document.createTextNode(text));
-           var button = document.createElement('button')
-           button.appendChild(document.createTextNode('Completed'))
-           button.setAttribute('name', 'complete');
-           button.setAttribute('value', 'Completed')
-           button.addEventListener('click', removeOrder);
-           order1.appendChild(button);
-           ul.appendChild(order1);
+    $.get(serverURL, function(data) {
+        for (key in data) {
+            orders.push(data[key]);
         }
-    }
+        for (var i=1; i<orders.length; i++) {
+            var text = orders[i];
+            text = JSON.stringify(text);
+            var order1 = document.createElement('li');
+            order1.appendChild(document.createTextNode(text));
+            var button = document.createElement('button')
+            button.appendChild(document.createTextNode('Completed'))
+            button.setAttribute('name', 'complete');
+            button.setAttribute('value', 'Completed')
+            button.addEventListener('click', removeOrder);
+            order1.appendChild(button);
+            ul.appendChild(order1);
+        }
+    });
+});
 
-})
+
+
+    // //This is my code for loading local storage
+    // if (localStorage.length === 0) {
+    //     var order1 = document.createElement('li');
+    //     order1.appendChild(document.createTextNode('No Orders to Display'));
+    //     ul.appendChild(order1);
+    // } else {
+    //     for (var i=1; i<localStorage.length; i++) {
+    //        var text = localStorage.getItem(localStorage.key(i));
+    //        var order1 = document.createElement('li');
+    //        order1.appendChild(document.createTextNode(text));
+    //        var button = document.createElement('button')
+    //        button.appendChild(document.createTextNode('Completed'))
+    //        button.setAttribute('name', 'complete');
+    //        button.setAttribute('value', 'Completed')
+    //        button.addEventListener('click', removeOrder);
+    //        order1.appendChild(button);
+    //        ul.appendChild(order1);
+    //     }
+    // }
+
+// })
 
 var removeOrder = function (e) {
     target = e.target;
     target = target.parentElement;
     target.remove();
     orderCount --;
-}
+};
+
+
 
 
 
