@@ -11,6 +11,9 @@ form.addEventListener('submit', function(event) {
     var orderJSON = JSON.stringify(order);
     orderJSON = orderJSON.replace(/"/g, '');
     orderJSON = orderJSON.replace(/,/g, ',  ');
+    orderJSON = orderJSON.replace(/:/g, ':  ');
+    orderJSON = orderJSON.replace(/}/g, '');
+    orderJSON = orderJSON.replace(/{/g, '');
     coffeeOrders.push(order);
     localStorage.setItem(`Order ${orderCount}`, orderJSON);
     localStorage.setItem('Counter', orderCount)
@@ -54,8 +57,18 @@ load.addEventListener('click', function(event) {
         for (var i=1; i<orders.length; i++) {
             var text = orders[i];
             text = JSON.stringify(text);
+            text=JSON.parse(text);
+            var order = {'Email': text.emailAddress, 'Coffee': text.coffee, 
+            'Size': text.size, 'Flavor': text.flavor, 'Strength': text.strength
+            };
+            var orderJSON = JSON.stringify(order);
+            orderJSON = orderJSON.replace(/"/g, '');
+            orderJSON = orderJSON.replace(/,/g, ',  ');
+            orderJSON = orderJSON.replace(/:/g, ':  ');
+            orderJSON = orderJSON.replace(/}/g, '');
+            orderJSON = orderJSON.replace(/{/g, '');
             var order1 = document.createElement('li');
-            order1.appendChild(document.createTextNode(text));
+            order1.appendChild(document.createTextNode(orderJSON));
             var button = document.createElement('button')
             button.appendChild(document.createTextNode('Completed'))
             button.setAttribute('name', 'complete');
