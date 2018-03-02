@@ -1,7 +1,7 @@
 var coffeeOrders = [];
 var form = document.querySelector('body > section > div > div > form');
 var orderCount = Number(localStorage.getItem('Counter'));
-var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
+var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders/';
 
 form.addEventListener('submit', function(event) {
     event.preventDefault();
@@ -89,7 +89,7 @@ load.addEventListener('click', function(event) {
 
 
 
-    // //This is my code for loading local storage
+    // //This is my code for loading local storage - obsolete now that it uses ajax
     // if (localStorage.length === 0) {
     //     var order1 = document.createElement('li');
     //     order1.appendChild(document.createTextNode('No Orders to Display'));
@@ -115,7 +115,17 @@ var removeOrder = function (e) {
     target = e.target;
     target = target.parentElement;
     target.remove();
-    orderCount --;
+    var list = target.firstChild;
+    var text = list.textContent;
+    text = JSON.stringify(text);
+    text = text.replace(/,/g, '');
+    text = text.split(" ");
+    text = text[2];
+    var deleteURL = serverURL + text;
+    $.ajax({
+        url: deleteURL,
+        method: 'DELETE',
+      })
 };
 
 
