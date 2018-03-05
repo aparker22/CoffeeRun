@@ -54,9 +54,7 @@ var createLoadOrder = function (text) {
 var submitOrderToServer = function (serverURL, serverOrder){
     $.post(serverURL, serverOrder, function(data){  
     });
-    return data;
 };
-
 
 
 //defining function for initially submitting orders
@@ -87,6 +85,26 @@ reset.addEventListener('click', function(event) {
 //variable for the load button
 var load = document.querySelector('body > section > div > div > form > button:nth-child(10)');
 
+
+
+//All of my promise code
+//function for promise
+// var promise = $.ajax({
+//     url: serverURL;
+// });
+
+// var orders = promise.then (createOrderList);
+
+// var createOrderList = function(data) {
+//     var orders = []
+//     for (key in data) {
+//         orders.push(data[key]);
+//     }
+//     return orders;
+// }
+
+
+
 //function for loading items from the server
 load.addEventListener('click', function(event) {
     clearingThePage(event);
@@ -111,7 +129,12 @@ load.addEventListener('click', function(event) {
 
 //function for marking orders as complete and removing them from the server completely
 var removeOrder = function (e) {
-    var target = removeFromPage(e);
+    var target = (e.target).parentElement;
+    console.log(target);
+    target.classList.add('blue')
+    setTimeout(function () {
+        removeFromPage(e);
+    }, 2000);
     var email = completedOrderEmail(target);
     var deleteURL = serverURL + email;
     $.ajax({

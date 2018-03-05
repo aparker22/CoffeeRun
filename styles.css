@@ -18,6 +18,10 @@ header {
     text-align: center;
 }
 
+ul {
+    padding: 0;
+    width: 100%;
+}
 li {
     list-style: none;
     display: block;
@@ -35,4 +39,10 @@ footer {
     width: 100%;
     min-height: 100px;
 }
+
+.blue {
+    width:100%;
+    background-color: rgb(27, 27, 105);
+    color: white;
+};
 
