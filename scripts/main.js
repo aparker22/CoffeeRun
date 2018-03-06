@@ -39,6 +39,7 @@ var createServerOrder = function (form) {
     var serverOrder = {'coffee': form.coffee.value, 'emailAddress': form.emailAddress.value,
     'size': form.size.value, 'flavor': form.flavor.value, 'strength': form.strength.value
     };
+    serverOrder = JSON.stringify(serverOrder);
     return serverOrder;
 };
 
@@ -50,11 +51,24 @@ var createLoadOrder = function (text) {
 };
 
 
-//function for sending orders to the server
-var submitOrderToServer = function (serverURL, serverOrder){
-    $.post(serverURL, serverOrder, function(data){  
-    });
+//function for sending orders to the server 
+
+var submitOrderToServer = function(serverURL, serverOrder) {
+    fetch(serverURL, {
+    method: 'POST',
+    body: serverOrder,
+    headers: new Headers({
+        'Content-Type': 'application/json'
+    })
+});
 };
+
+
+//(ajax method, no longer needed)
+// var submitOrderToServer = function (serverURL, serverOrder){
+//     $.post(serverURL, serverOrder, function(data){  
+//     });
+// };
 
 
 //defining function for initially submitting orders
@@ -87,35 +101,19 @@ var load = document.querySelector('body > section > div > div > form > button:nt
 
 
 
-//All of my promise code
-//function for promise
-// var promise = $.ajax({
-//     url: serverURL;
-// });
-
-// var orders = promise.then (createOrderList);
-
-// var createOrderList = function(data) {
-//     var orders = []
-//     for (key in data) {
-//         orders.push(data[key]);
-//     }
-//     return orders;
-// }
-
-
-
 //function for loading items from the server
 load.addEventListener('click', function(event) {
     clearingThePage(event);
-    var orders = [];
-
-    $.get(serverURL, function(data) {
-        for (key in data) {
-            orders.push(data[key]);
-        }
-        for (var i=1; i<orders.length; i++) {
-            var text = orders[i];
+    fetch(serverURL)
+        .then(function (response) {
+            return response.json();
+            })
+        .then(function(data) {
+            return (Object.values(data))
+        })
+        .then(function(data) {
+            for (var i=1; i<data.length; i++) {
+            var text = data[i];
             text = JSON.stringify(text);
             text=JSON.parse(text);
             var order = createLoadOrder(text);
@@ -123,9 +121,11 @@ load.addEventListener('click', function(event) {
             var finalOrder = createLiElement(prettyOrder);
             var ul = document.querySelector('body > footer > ul');
             ul.appendChild(finalOrder);
-        }
-    });
+            }
+        })
+
 });
+
 
 //function for marking orders as complete and removing them from the server completely
 var removeOrder = function (e) {
