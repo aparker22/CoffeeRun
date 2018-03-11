@@ -5,26 +5,65 @@ var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders/';
 
 
  //this makes it prettier for display purposes
- var makeItPretty = function(text) {
-    var textJSON = JSON.stringify(text)
-    textJSON = textJSON.replace(/"/g, '');
-    textJSON = textJSON.replace(/,/g, ',  ');
-    textJSON = textJSON.replace(/:/g, ':  ');
-    textJSON = textJSON.replace(/}/g, '');
-    textJSON = textJSON.replace(/{/g, '');
-    return textJSON;
+var orderDisplay = function(orderList) {
+    addOrderListToTable(orderList);
 };
 
+var addOrderListToTable = function(orderList) {
+    var searchDiv = document.querySelector('.load-results')
+    var table = document.createElement('table');
+    var headerRow = table.insertRow(-1);
+    var headerNameCell = document.createElement('TH');
+    headerNameCell.textContent = 'Email Address';
+    headerRow.appendChild(headerNameCell);
+
+
+    var headerAddressCell = document.createElement('TH');
+    headerAddressCell.textContent = 'Coffee';
+    headerRow.appendChild(headerAddressCell);
+
+    var headerRatingCell = document.createElement('TH');
+    headerRatingCell.textContent = 'Size';
+    headerRow.appendChild(headerRatingCell);
+    searchDiv.appendChild(table);
+
+    var headerRatingCell = document.createElement('TH');
+    headerRatingCell.textContent = 'Flavor';
+    headerRow.appendChild(headerRatingCell);
+    searchDiv.appendChild(table);
+
+    var headerRatingCell = document.createElement('TH');
+    headerRatingCell.textContent = 'Strength';
+    headerRow.appendChild(headerRatingCell);
+    searchDiv.appendChild(table);
+    
+    orderList.forEach(function(order) {
+        var row = table.insertRow();
+        var emailCell = row.insertCell(0);
+        emailCell.textContent = order.Email;
+        var coffeeCell = row.insertCell(1);
+        coffeeCell.textContent = order.Coffee;
+        var sizeCell = row.insertCell(2);
+        sizeCell.textContent = order.Size;
+        var flavorCell = row.insertCell(3);
+        flavorCell.textContent = order.Flavor;
+        var strengthCell = row.insertCell(4);
+        strengthCell.textContent = order.Strength;
+        var buttonCell = row.insertCell(5);
+        var button = createButtonElement();
+        buttonCell.appendChild(button);
+
+    });
+    searchDiv.appendChild(table);
+}
+
 //function for creating the li that will be appended to the DOM
-var createLiElement = function (order) {
-    var orderLI = document.createElement('li');
-    orderLI.textContent = order;
+var createButtonElement = function () {
     var button = document.createElement('button')
     button.textContent = 'Completed';
     button.setAttribute('name', 'complete');
     button.addEventListener('click', removeOrder);
-    orderLI.appendChild(button);
-    return orderLI;
+    return button;
 };
 
 // function to create order values in readable format
@@ -63,26 +102,15 @@ var submitOrderToServer = function(serverURL, serverOrder) {
 });
 };
 
-
-//(ajax method, no longer needed)
-// var submitOrderToServer = function (serverURL, serverOrder){
-//     $.post(serverURL, serverOrder, function(data){  
-//     });
-// };
-
-
 //defining function for initially submitting orders
 form.addEventListener('submit', function(event) {
     event.preventDefault();
     var order = createOrderValues(form);  
+    var orderList = [];
     var serverOrder = createServerOrder(form); ///format the order to be sent to the server
-    var prettyOrder = makeItPretty(order); //format the order to be rendered on the screen
     submitOrderToServer(serverURL, serverOrder);
-
-    //appends new orders to the page with a 'completed button'
-    var ul = document.querySelector('body > footer > ul')
-    var finalOrder = createLiElement(prettyOrder);
-    ul.appendChild(finalOrder);
+    orderList.push(order);
+    orderDisplay(orderList);
     form.reset();
 });
 
@@ -104,6 +132,10 @@ var load = document.querySelector('body > section > div > div > form > button:nt
 //function for loading items from the server
 load.addEventListener('click', function(event) {
     clearingThePage(event);
+    fetchOrders();
+})
+    
+var fetchOrders = function() {
     fetch(serverURL)
         .then(function (response) {
             return response.json();
@@ -112,25 +144,24 @@ load.addEventListener('click', function(event) {
             return (Object.values(data))
         })
         .then(function(data) {
-            for (var i=1; i<data.length; i++) {
-            var text = data[i];
-            text = JSON.stringify(text);
-            text=JSON.parse(text);
-            var order = createLoadOrder(text);
-            var prettyOrder = makeItPretty(order);
-            var finalOrder = createLiElement(prettyOrder);
-            var ul = document.querySelector('body > footer > ul');
-            ul.appendChild(finalOrder);
-            }
+            var orderList = data.map(function(obj) {
+                var orderInformation = createLoadOrder(obj);
+                return orderInformation;
+            })
+            return orderList;
+            })
+        .then(function(data) {
+            orderDisplay(data)
         })
+    }
 
-});
+
 
 
 //function for marking orders as complete and removing them from the server completely
 var removeOrder = function (e) {
-    var target = (e.target).parentElement;
-    console.log(target);
+    var target = (e.target).parentElement.parentElement;
+    console.log(target)
     target.classList.add('blue')
     setTimeout(function () {
         removeFromPage(e);
@@ -146,7 +177,7 @@ var removeOrder = function (e) {
 
 //function to remove the completed order from the page
 var removeFromPage = function (e) {
-    var target = (e.target).parentElement;
+    var target = (e.target).parentElement.parentElement;
     target.remove();
     return target;
 };
@@ -154,19 +185,15 @@ var removeFromPage = function (e) {
 //function to identify the email address of the completed order
 var completedOrderEmail = function (target) {
     var text = (target.firstChild).textContent;
-    text = JSON.stringify(text);
-    text = text.replace(/,/g, '');
-    text = text.split(" ");
-    email = text[2];
-    return email;
+    return text;
 };
 
 
 //clears the page does not remove items from server
 var clearingThePage = function (event) {
     event.preventDefault();
-    var ul = document.querySelector('body > footer > ul');
-    while (ul.firstChild) ul.removeChild(ul.firstChild);
+    var searchDiv = document.querySelector('.load-results');
+    while (searchDiv.firstChild) searchDiv.removeChild(searchDiv.firstChild);
 };
 
 
